@@ -1,12 +1,12 @@
-#import sposób 1:
+# import sposób 1:
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 
-#import sposób 2 i 1b:
+# import sposób 2 i 1b:
 from src.utils.imports import *   
-#import sposób 3:
-# from ..utils.imports import *   
+# import sposób 3:
+# from ..utils.imports import *
 
 
 df = load_kaggle_dataset(
@@ -19,7 +19,7 @@ df = load_kaggle_dataset(
 print(df.head())
 
 target = 'G3'
-# df = df.drop(columns=['G1', 'G2'])
+df = df.drop(columns=['G1', 'G2'])
 
 X = df.drop(columns=[target])
 y = df[target]
@@ -62,7 +62,12 @@ def objective(trial):
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0)
     }
     model = XGBRegressor(**params, random_state=42)
-    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=3).mean()
+    kf = KFold(
+        n_splits=kfold_param["n_splits"],
+        random_state=kfold_param["random_state"],
+        shuffle=kfold_param["shuffle"],
+    )
+    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=kf).mean()
 
 study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=30)

@@ -13,7 +13,7 @@ from scipy.stats import pearsonr, spearmanr
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import cross_val_score, train_test_split, KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from xgboost import XGBRegressor
@@ -22,5 +22,5 @@ import shap
 
 # --- Local imports ---
 from src.utils.utils import load_kaggle_dataset
-from src.config.config_d import config
+from src.config.config_d import config, kfold_param
 
