@@ -60,6 +60,9 @@ print(selected_features)
 # Podział na zbiory
 X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
 
+# Standaryzacja - czy nie powinnyśmy jej zrobić przed kolejnymi działaniami?
+# Odp nie, bo w X_selected są już dane po standaryzacji, ale przez to do innych modeli będą brane tylko X_sel
+
 # Optuna tuning
 def objective(trial):
     params = {
@@ -73,13 +76,13 @@ def objective(trial):
     kf = KFold(
         n_splits=kfold_param["n_splits"],
         random_state=kfold_param["random_state"],
-        shuffle=kfold_param["shuffle"],
+        shuffle=kfold_param["shuffle"]
     )
     return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=kf).mean()
 
 study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=30)
-
+print("Najlepsze parametry:", study.best_params)
 # Finalny model
 final_model = XGBRegressor(**study.best_params, random_state=42)
 final_model.fit(X_train, y_train)
@@ -109,4 +112,105 @@ shap.summary_plot(shap_values, X_train_selected)
 
 # Zapis modelu
 joblib.dump(final_model, 'xgb_g3_model.pkl')
-# nied
+
+# Inne modele do porównania:
+reg_models = {
+    "XGB Regressor": final_model,
+    "Gradient Boosting": GradientBoostingRegressor(),
+    "Linear Regression": LinearRegression(),
+    "Ridge Regression": Ridge(alpha=1.0),
+    "Lasso Regression": Lasso(alpha=0.1),
+    "Decision Tree": DecisionTreeRegressor(),
+    "Random Forest": RandomForestRegressor(),
+    "Support Vector Regressor": SVR(),
+    "K-Nearest Neighbors": KNeighborsRegressor(),
+    "Gradient Boosting": GradientBoostingRegressor()  
+}
+reg_results=[]
+
+
+for name, model in reg_models.items():
+    model.fit(X_train, y_train)
+    y_pred=model.predict(X_test)
+    mse=mean_squared_error(y_test, y_pred)
+    mae=mean_absolute_error(y_test, y_pred)
+    r2=r2_score(y_test, y_pred)
+    reg_results.append([name, mse, mae, r2])
+    # print(f"{name} -> MSE: {mse:.3f}, MAE:{mae:.3f}, R²:{r2:.3f}")
+    
+df_reg_results = pd.DataFrame(reg_results, columns=["Model", "MSE", "MAE", "R2"])
+print("\nPorównanie modeli (użyte X_train bez CV):\n", df_reg_results)
+
+reg_results_cv = {"Model": [], "Metric": [], "Value": []}
+for name, model in reg_models.items():
+    kf = KFold(
+    n_splits=kfold_param["n_splits"],
+    random_state=kfold_param["random_state"],
+    shuffle=kfold_param["shuffle"])
+    mse_scores = -cross_val_score(model, X_selected, y, scoring="neg_mean_squared_error", cv=kf)
+    mae_scores = -cross_val_score(model, X_selected, y, scoring="neg_mean_absolute_error", cv=kf)
+    r2_scores  = cross_val_score(model, X_selected, y, scoring="r2", cv=kf)
+
+    for score in mse_scores:
+        reg_results_cv["Model"].append(name)
+        reg_results_cv["Metric"].append("MSE")
+        reg_results_cv["Value"].append(score)
+    for score in mae_scores:
+        reg_results_cv["Model"].append(name)
+        reg_results_cv["Metric"].append("MAE")
+        reg_results_cv["Value"].append(score)
+    for score in r2_scores:
+        reg_results_cv["Model"].append(name)
+        reg_results_cv["Metric"].append("R²")
+        reg_results_cv["Value"].append(score)
+
+df_reg_results_cv = pd.DataFrame(reg_results_cv)
+
+plt.figure(figsize=(12,4))
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MSE"], x="Model", y="Value")
+plt.xticks(rotation=45)
+plt.title(f"Boxplot MSE ({kfold_param["n_splits"]}-fold CV)")
+plt.show()
+
+plt.figure(figsize=(12,4))
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MAE"], x="Model", y="Value")
+plt.xticks(rotation=45)
+plt.title(f"Boxplot MAE ({kfold_param["n_splits"]}-fold CV)")
+plt.show()
+
+plt.figure(figsize=(12,4))
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="R²"], x="Model", y="Value")
+plt.xticks(rotation=45)
+plt.title(f"Boxplot R² ({kfold_param["n_splits"]}-fold CV)")
+plt.show()
+
+
+
+
+
+
+#Do klasyfikacji:
+# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import LabelEncoder
+# from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+# from sklearn.svm import SVC
+# from sklearn.neighbors import KNeighborsClassifier
+# try_models={
+#     "Logistic Regression": LogisticRegression(max_iter=1000),
+#     "Decision Tree": DecisionTreeClassifier(),
+#     "Random Forest": RandomForestClassifier(),
+#     "Support Vector Machine": SVC(),
+#     "K-Nearest Neighbors": KNeighborsClassifier(),
+#     "Gradient Boosting": GradientBoostingClassifier()
+# }
+
+# for name, model in try_models.items():
+#     model.fit(X_train, y_train)
+#     y_pred=model.predict(X_test)
+#     print(name, "Accuracy:", r2_score(y_test, y_pred))
+#     print(name, "Confusion matrix:", r2_score(y_test, y_pred))
+#     print(name, "recall:", r2_score(y_test, y_pred))
+#     print(name, "ROC AUC:", r2_score(y_test, y_pred))
