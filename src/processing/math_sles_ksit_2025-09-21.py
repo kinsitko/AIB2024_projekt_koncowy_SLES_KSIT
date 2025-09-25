@@ -131,7 +131,7 @@ for name, model in reg_models.items():
     # print(f"{name} -> MSE: {mse:.3f}, MAE:{mae:.3f}, R²:{r2:.3f}")
     
 df_reg_results = pd.DataFrame(reg_results, columns=["Model", "MSE", "MAE", "R2"])
-print("\nPorównanie modeli (użyte X_train bez CV):\n", df_reg_results)
+print("\nPorównanie wyników z innymi modelami (train/test split, bez CV):\n", df_reg_results)
 
 reg_results_cv = {"Model": [], "Metric": [], "Value": []}
 for name, model in reg_models.items():
@@ -158,6 +158,11 @@ for name, model in reg_models.items():
 
 df_reg_results_cv = pd.DataFrame(reg_results_cv)
 
+xgb_cv = df_reg_results_cv[df_reg_results_cv["Model"] == "XGB Regressor"]
+print("\nWyniki dla XGB (z CV):")
+print(xgb_cv.groupby("Metric")["Value"].agg(["mean","median", "std"]))
+
+
 plt.figure(figsize=(10,7))
 sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MSE"], x="Model", y="Value")
 plt.xticks(rotation=20)
@@ -175,31 +180,3 @@ sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="R²"], x="Model
 plt.xticks(rotation=20)
 plt.title(f"Boxplot R² ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
-
-
-
-#Do klasyfikacji:
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import LabelEncoder
-# from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.tree import DecisionTreeClassifier
-# from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-# from sklearn.svm import SVC
-# from sklearn.neighbors import KNeighborsClassifier
-# try_models={
-#     "Logistic Regression": LogisticRegression(max_iter=1000),
-#     "Decision Tree": DecisionTreeClassifier(),
-#     "Random Forest": RandomForestClassifier(),
-#     "Support Vector Machine": SVC(),
-#     "K-Nearest Neighbors": KNeighborsClassifier(),
-#     "Gradient Boosting": GradientBoostingClassifier()
-# }
-
-# for name, model in try_models.items():
-#     model.fit(X_train, y_train)
-#     y_pred=model.predict(X_test)
-#     print(name, "Accuracy:", r2_score(y_test, y_pred))
-#     print(name, "Confusion matrix:", r2_score(y_test, y_pred))
-#     print(name, "recall:", r2_score(y_test, y_pred))
-#     print(name, "ROC AUC:", r2_score(y_test, y_pred))

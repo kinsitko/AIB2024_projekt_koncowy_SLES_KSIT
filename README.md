@@ -59,7 +59,37 @@ python src/processing/math_sles_ksit(najnowsza_data).py
 - Metryki ewaluacyjne: MSE, MAE, R²
 - Wizualizacje: rozkłady cech, korelacje, SHAP feature importance
 
-***Tu wkleić nasze wyniki*** 
+
+**Wybrane cechy feature importance:**
+['num__failures' 'num__goout' 'num__absences' 'cat__sex_M'
+ 'cat__Pstatus_T' 'cat__Fjob_other' 'cat__Fjob_teacher'
+ 'cat__guardian_other' 'cat__schoolsup_yes' 'cat__higher_yes']
+
+ **Najlepsze parametry wg Optuna:**
+ {'n_estimators': 175, 'max_depth': 3, 'learning_rate': 0.04279589903340042, 'subsample': 0.5551067007705357, 'colsample_bytree': 0.7485072229441385}
+
+
+
+**Porównanie wyników z innymi modelami (train/test split, bez CV):**
+                Model        MSE       MAE        R2
+0      XGB Regressor  19.940844  3.419452  0.034743
+1  Linear Regression  19.787851  3.424421  0.042149
+2   Lasso Regression  20.337674  3.479875  0.015534
+3      Random Forest  22.640187  3.544645 -0.095921
+4     KNN Regression  21.705500  3.717500 -0.050677
+
+**Wyniki dla XGB - z train/test split:**
+
+MSE: 19.940844
+MAE: 3.419451
+R²: 0.034743
+
+**Wyniki dla XGB - z 4-fold CV:**
+
+Metric       mean     median       std
+MSE     15.496397  16.686890  2.769949
+MAE      3.049940   3.082985  0.246590
+R²       0.258627   0.200709  0.107292
 
 ## Technologie
 
