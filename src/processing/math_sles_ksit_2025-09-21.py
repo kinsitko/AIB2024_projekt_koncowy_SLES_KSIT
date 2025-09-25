@@ -60,9 +60,6 @@ print(selected_features)
 # Podział na zbiory
 X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
 
-# Standaryzacja - czy nie powinnyśmy jej zrobić przed kolejnymi działaniami?
-# Odp nie, bo w X_selected są już dane po standaryzacji, ale przez to do innych modeli będą brane tylko X_sel
-
 # Optuna tuning
 def objective(trial):
     params = {
@@ -114,20 +111,19 @@ shap.summary_plot(shap_values, X_train_selected)
 joblib.dump(final_model, 'xgb_g3_model.pkl')
 
 # Inne modele do porównania:
+
 reg_models = {
     "XGB Regressor": final_model,
     "Gradient Boosting": GradientBoostingRegressor(),
     "Linear Regression": LinearRegression(),
-    "Ridge Regression": Ridge(alpha=1.0),
+    "Ridge Regression": Ridge(alpha=0.01),
     "Lasso Regression": Lasso(alpha=0.1),
     "Decision Tree": DecisionTreeRegressor(),
     "Random Forest": RandomForestRegressor(),
     "Support Vector Regressor": SVR(),
-    "K-Nearest Neighbors": KNeighborsRegressor(),
-    "Gradient Boosting": GradientBoostingRegressor()  
+    "K-Nearest Neighbors": KNeighborsRegressor()  
 }
 reg_results=[]
-
 
 for name, model in reg_models.items():
     model.fit(X_train, y_train)
@@ -140,6 +136,22 @@ for name, model in reg_models.items():
     
 df_reg_results = pd.DataFrame(reg_results, columns=["Model", "MSE", "MAE", "R2"])
 print("\nPorównanie modeli (użyte X_train bez CV):\n", df_reg_results)
+
+# Dlaczego wyniki na X_transformed wychodzą nam lepsze niż na X_selected? 
+# Xt_train, Xt_test, yt_train, yt_test = train_test_split(X_transformed, y, test_size=0.2, random_state=42)
+# t_reg_results=[]
+
+# for name, model in reg_models.items():
+#     model.fit(Xt_train, yt_train)
+#     yt_pred=model.predict(Xt_test)
+#     mse=mean_squared_error(yt_test, yt_pred)
+#     mae=mean_absolute_error(yt_test, yt_pred)
+#     r2=r2_score(yt_test, yt_pred)
+#     t_reg_results.append([name, mse, mae, r2])
+#     # print(f"{name} -> MSE: {mse:.3f}, MAE:{mae:.3f}, R²:{r2:.3f}")
+    
+# df_t_reg_results = pd.DataFrame(t_reg_results, columns=["Model", "MSE", "MAE", "R2"])
+# print("\nPorównanie modeli (użyte Xt_train bez CV):\n", df_t_reg_results)
 
 reg_results_cv = {"Model": [], "Metric": [], "Value": []}
 for name, model in reg_models.items():

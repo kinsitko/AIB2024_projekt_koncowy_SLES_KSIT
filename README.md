@@ -16,9 +16,9 @@ projekt_koncowy_AIB2024_KSIT_SLES/
 │ ├── config/ # pliki konfiguracyjne
 │ ├── models/ # trenowanie, tuning i ewaluacja modeli
 │ ├── pipelines/ # pipeline'y ML (trening/predykcja)
-│ └── utils/ # funkcje pomocnicze
+│ ├── utils/ # funkcje pomocnicze
+│ └── imports/ # niezbędne importy
 │
-├── tests/ # testy jednostkowe
 │
 ├── requirements.txt # lista wymaganych bibliotek
 ├── README.md # opis projektu
