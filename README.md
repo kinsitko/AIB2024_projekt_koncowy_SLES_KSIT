@@ -14,11 +14,8 @@ projekt_koncowy_AIB2024_KSIT_SLES/
 │
 ├── src/
 │ ├── config/ # pliki konfiguracyjne
-│ ├── models/ # trenowanie, tuning i ewaluacja modeli
-│ ├── pipelines/ # pipeline'y ML (trening/predykcja)
-│ ├── utils/ # funkcje pomocnicze
-│ └── imports/ # niezbędne importy
-│
+│ ├── processing/ # trenowanie, tuning i ewaluacja modeli, pipelin'y
+│ └── utils/ # funkcje pomocnicze i niezbędne importy
 │
 ├── requirements.txt # lista wymaganych bibliotek
 ├── README.md # opis projektu
@@ -40,7 +37,7 @@ kaggle datasets download -d adilshamim8/math-students -p data/raw --unzip
 
 ## Wymagania
 
-Do uruchomienia projektu potrzebujesz Python 3.10+ oraz pakiety z pliku requirements.txt.
+Do uruchomienia projektu potrzebny jest Python 3.10+ oraz pakiety z pliku requirements.txt.
 
 ## Uruchamianie
 
@@ -49,20 +46,17 @@ Uruchom notebook:
 jupyter notebook notebooks/EDA.ipynb
 
 
-2. Trenowanie modelu
-Pipeline treningowy:
-python src/pipelines/train_pipeline.py
-
-3. Predykcja
-Użycie wytrenowanego modelu na nowych danych:
-python src/pipelines/predict_pipeline.py --input data/external/new_data.csv
-
+2. Trenowanie modelu i predykcja danych
+Pipeline treningowy i użycie wytrenowanego modelu na nowych danych:
+python src/processing/math_sles_ksit(najnowsza_data).py
 
 ## Wyniki
 
-- Modele testowane: XGBoost, RandomForest, Linear Regression
+- Modele testowane: 
+    - Główny model XGBoost,
+    - Modele porównawcze: Linear Regression, Lasso Regression, RandomForest, KNN Regression
 - Optymalizacja hiperparametrów: Optuna
-- Metryki ewaluacyjne: RMSE, MAE, R²
+- Metryki ewaluacyjne: MSE, MAE, R²
 - Wizualizacje: rozkłady cech, korelacje, SHAP feature importance
 
 ***Tu wkleić nasze wyniki*** 

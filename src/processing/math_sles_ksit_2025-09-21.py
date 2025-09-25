@@ -110,18 +110,14 @@ shap.summary_plot(shap_values, X_train_selected)
 # Zapis modelu
 joblib.dump(final_model, 'xgb_g3_model.pkl')
 
-# Inne modele do porównania:
+# Porównanie z innymi modelami:
 
 reg_models = {
     "XGB Regressor": final_model,
-    "Gradient Boosting": GradientBoostingRegressor(),
     "Linear Regression": LinearRegression(),
-    "Ridge Regression": Ridge(alpha=0.01),
     "Lasso Regression": Lasso(alpha=0.1),
-    "Decision Tree": DecisionTreeRegressor(),
     "Random Forest": RandomForestRegressor(),
-    "Support Vector Regressor": SVR(),
-    "K-Nearest Neighbors": KNeighborsRegressor()  
+    "KNN Regression": KNeighborsRegressor()  
 }
 reg_results=[]
 
@@ -136,22 +132,6 @@ for name, model in reg_models.items():
     
 df_reg_results = pd.DataFrame(reg_results, columns=["Model", "MSE", "MAE", "R2"])
 print("\nPorównanie modeli (użyte X_train bez CV):\n", df_reg_results)
-
-# Dlaczego wyniki na X_transformed wychodzą nam lepsze niż na X_selected? 
-# Xt_train, Xt_test, yt_train, yt_test = train_test_split(X_transformed, y, test_size=0.2, random_state=42)
-# t_reg_results=[]
-
-# for name, model in reg_models.items():
-#     model.fit(Xt_train, yt_train)
-#     yt_pred=model.predict(Xt_test)
-#     mse=mean_squared_error(yt_test, yt_pred)
-#     mae=mean_absolute_error(yt_test, yt_pred)
-#     r2=r2_score(yt_test, yt_pred)
-#     t_reg_results.append([name, mse, mae, r2])
-#     # print(f"{name} -> MSE: {mse:.3f}, MAE:{mae:.3f}, R²:{r2:.3f}")
-    
-# df_t_reg_results = pd.DataFrame(t_reg_results, columns=["Model", "MSE", "MAE", "R2"])
-# print("\nPorównanie modeli (użyte Xt_train bez CV):\n", df_t_reg_results)
 
 reg_results_cv = {"Model": [], "Metric": [], "Value": []}
 for name, model in reg_models.items():
@@ -178,26 +158,23 @@ for name, model in reg_models.items():
 
 df_reg_results_cv = pd.DataFrame(reg_results_cv)
 
-plt.figure(figsize=(12,4))
+plt.figure(figsize=(10,7))
 sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MSE"], x="Model", y="Value")
-plt.xticks(rotation=45)
+plt.xticks(rotation=20)
 plt.title(f"Boxplot MSE ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
 
-plt.figure(figsize=(12,4))
+plt.figure(figsize=(10,7))
 sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MAE"], x="Model", y="Value")
-plt.xticks(rotation=45)
+plt.xticks(rotation=20)
 plt.title(f"Boxplot MAE ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
 
-plt.figure(figsize=(12,4))
+plt.figure(figsize=(10,7))
 sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="R²"], x="Model", y="Value")
-plt.xticks(rotation=45)
+plt.xticks(rotation=20)
 plt.title(f"Boxplot R² ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
-
-
-
 
 
 

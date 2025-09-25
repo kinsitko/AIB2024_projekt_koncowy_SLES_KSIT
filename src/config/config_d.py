@@ -4,4 +4,4 @@ config = {
     "csv_file_name": "Math-Students.csv",
     "data_path": "data"
 }
-kfold_param = {"n_splits":6, "random_state":42, "shuffle":True}
+kfold_param = {"n_splits":3, "random_state":42, "shuffle":True}
