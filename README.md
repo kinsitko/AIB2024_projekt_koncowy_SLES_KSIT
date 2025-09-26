@@ -72,24 +72,24 @@ python src/processing/math_sles_ksit(najnowsza_data).py
 
 **Porównanie wyników z innymi modelami (train/test split, bez CV):**
                 Model        MSE       MAE        R2
-0      XGB Regressor  19.940844  3.419452  0.034743
+0      XGB Regressor  19.131135  3.366837  0.073938
 1  Linear Regression  19.787851  3.424421  0.042149
 2   Lasso Regression  20.337674  3.479875  0.015534
-3      Random Forest  22.640187  3.544645 -0.095921
+3      Random Forest  23.799324  3.638400 -0.152030
 4     KNN Regression  21.705500  3.717500 -0.050677
 
 **Wyniki dla XGB - z train/test split:**
 
-MSE: 19.940844
-MAE: 3.419451
-R²: 0.034743
+MSE: 19.131135
+MAE: 3.366836
+R²: 0.073938
 
-**Wyniki dla XGB - z 4-fold CV:**
-
+**Wyniki dla XGB - z 3-fold CV:**
+      
 Metric       mean     median       std
-MSE     15.496397  16.686890  2.769949
-MAE      3.049940   3.082985  0.246590
-R²       0.258627   0.200709  0.107292
+MSE     15.281486  16.825067  2.736966
+MAE      2.988295   3.020380  0.243937
+R²       0.268575   0.230307  0.110279
 
 ## Technologie
 

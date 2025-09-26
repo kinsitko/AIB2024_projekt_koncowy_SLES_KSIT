@@ -79,7 +79,7 @@ def objective(trial):
  
 study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=30)
-print("Najlepsze parametry:", study.best_params)
+print("Najlepsze hiperparametry:", study.best_params)
 
 # Finalny model
 final_model = XGBRegressor(**study.best_params, random_state=42)
@@ -165,19 +165,19 @@ print(xgb_cv.groupby("Metric")["Value"].agg(["mean","median", "std"]))
 
 
 plt.figure(figsize=(10,7))
-sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MSE"], x="Model", y="Value")
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MSE"], x="Model", y="Value",color='orange')
 plt.xticks(rotation=20)
 plt.title(f"Boxplot MSE ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
 
 plt.figure(figsize=(10,7))
-sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MAE"], x="Model", y="Value")
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="MAE"], x="Model", y="Value",color='deepskyblue')
 plt.xticks(rotation=20)
 plt.title(f"Boxplot MAE ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
 
 plt.figure(figsize=(10,7))
-sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="R²"], x="Model", y="Value")
+sns.boxplot(data=df_reg_results_cv[df_reg_results_cv["Metric"]=="R²"], x="Model", y="Value",color='yellowgreen')
 plt.xticks(rotation=20)
 plt.title(f"Boxplot R² ({kfold_param["n_splits"]}-fold CV)")
 plt.show()
