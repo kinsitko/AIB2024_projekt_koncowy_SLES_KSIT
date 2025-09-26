@@ -28,25 +28,27 @@ y = df[target]
 categorical_features = X.select_dtypes(include='object').columns.tolist()
 numerical_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
 
+# Podział na zbiory
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
 # Preprocessing
 preprocessor = ColumnTransformer([
     ('num', StandardScaler(), numerical_features),
     ('cat', OneHotEncoder(drop='first', sparse_output=False), categorical_features)
 ])
 
-
-def select_features(X, y):
+def select_features(X_train, y_train):
     pipe = Pipeline([
         ('preprocessor', preprocessor),
         ('model', XGBRegressor(n_estimators=100, max_depth=5, learning_rate=0.1, random_state=42))
     ])
-    pipe.fit(X, y)
+    pipe.fit(X_train, y_train)
     model = pipe.named_steps['model']
-    X_preprocessed = pipe.named_steps['preprocessor'].transform(X)
+    X_preprocessed = pipe.named_steps['preprocessor'].transform(X_train)
     selector = SelectFromModel(model, prefit=True)
     return selector, X_preprocessed, pipe
 
-selector, X_transformed, full_pipe = select_features(X, y)
+selector, X_transformed, full_pipe = select_features(X_train, y_train)
 X_selected = selector.transform(X_transformed)
 
 
@@ -57,8 +59,6 @@ print("Wybrane cechy:")
 print(selected_features)
 
 
-# Podział na zbiory
-X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
 
 # Optuna tuning
 def objective(trial):
