@@ -65,7 +65,7 @@ python src/processing/math_sles_ksit(najnowsza_data).py
  'cat__Pstatus_T' 'cat__Fjob_other' 'cat__Fjob_teacher'
  'cat__guardian_other' 'cat__schoolsup_yes' 'cat__higher_yes']
 
- **Najlepsze parametry wg Optuna:**
+ **Najlepsze hiperparametry wg Optuna:**
  {'n_estimators': 175, 'max_depth': 3, 'learning_rate': 0.04279589903340042, 'subsample': 0.5551067007705357, 'colsample_bytree': 0.7485072229441385}
 
 

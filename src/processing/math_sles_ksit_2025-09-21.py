@@ -99,13 +99,13 @@ plt.title("Residual Plot")
 plt.show()
 
 # SHAP interpretacja
-
-X_train_selected = pd.DataFrame(X_selected, columns=selected_features)
+X_train_selected = pd.DataFrame(X_train,columns=selected_features)
+X_test=pd.DataFrame(X_test, columns=selected_features)
 explainer = shap.Explainer(final_model, X_train_selected.astype(np.float64))
-shap_values = explainer(X_train_selected.astype(np.float64), check_additivity=False)
+shap_values = explainer.shap_values(X_test.astype(np.float64),check_additivity=False)
 
-shap.summary_plot(shap_values, X_train_selected, plot_type="bar")
-shap.summary_plot(shap_values, X_train_selected)
+shap.summary_plot(shap_values, X_test, plot_type="bar")
+shap.summary_plot(shap_values, X_test)
 
 # Zapis modelu
 joblib.dump(final_model, 'xgb_g3_model.pkl')
