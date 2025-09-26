@@ -69,10 +69,17 @@ def objective(trial):
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0)
     }
     model = XGBRegressor(**params, random_state=42)
-    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=3).mean()
+    kf = KFold(
+        n_splits=kfold_param["n_splits"],
+        random_state=kfold_param["random_state"],
+        shuffle=kfold_param["shuffle"]
+    )
+    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=kf).mean()
 
+ 
 study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=30)
+print("Najlepsze parametry:", study.best_params)
 
 # Finalny model
 final_model = XGBRegressor(**study.best_params, random_state=42)
