@@ -49,13 +49,12 @@ def select_features(X, y):
 selector, X_transformed, full_pipe = select_features(X, y)
 X_selected = selector.transform(X_transformed)
 
-
 feature_names = full_pipe.named_steps['preprocessor'].get_feature_names_out()
 selected_mask = selector.get_support()
 selected_features = feature_names[selected_mask]
+
 print("Wybrane cechy:")
 print(selected_features)
-
 
 # Podział na zbiory
 X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size=0.2, random_state=42)
@@ -70,16 +69,11 @@ def objective(trial):
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0)
     }
     model = XGBRegressor(**params, random_state=42)
-    kf = KFold(
-        n_splits=kfold_param["n_splits"],
-        random_state=kfold_param["random_state"],
-        shuffle=kfold_param["shuffle"]
-    )
-    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=kf).mean()
+    return -cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=3).mean()
 
 study = optuna.create_study(direction='minimize')
 study.optimize(objective, n_trials=30)
-print("Najlepsze parametry:", study.best_params)
+
 # Finalny model
 final_model = XGBRegressor(**study.best_params, random_state=42)
 final_model.fit(X_train, y_train)
